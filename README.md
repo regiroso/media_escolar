@@ -54,21 +54,21 @@ Resultado:
 
 ### Checklist
 
-- [ x ] Criar o Projeto Flutter
-- [ x ] Criar o campo de nome
-- [ x ] Criar os três campos de nota
-- [ x ] Criar o botão Calcular
-- [ x ] Calcular média
-- [ x ] Verificar a situação do aluno
-- [ x ] Criar Mostrar o resultado
-- [ x ] Criar o botão limpar
-- [ x ] Validar notas entre 0 e 10 
-- [ x ] Testar o Aplicativo
+- [X] Criar o Projeto Flutter
+- [X] Criar o campo de nome
+- [X] Criar os três campos de nota
+- [X] Criar o botão Calcular
+- [X] Calcular média
+- [X] Verificar a situação do aluno
+- [X] Criar Mostrar o resultado
+- [X] Criar o botão limpar
+- [X] Validar notas entre 0 e 10 
+- [X] Testar o Aplicativo
 
 ### Desafio
 
-- [   ] Adicionar uma quarta nota
-- [   ] Mostrar a maior nota
-- [   ] Mostrar a menor nota
-- [   ] Informar quantos pontos faltaram para aprovação
-- [   ] Reprovar o aluno que tiver uma frequência menor que 75%
+- [X] Adicionar uma quarta nota
+- [ ] Mostrar a maior nota
+- [ ] Mostrar a menor nota
+- [ ] Informar quantos pontos faltaram para aprovação
+- [ ] Reprovar o aluno que tiver uma frequência menor que 75%

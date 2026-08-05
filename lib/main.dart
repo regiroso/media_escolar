@@ -33,6 +33,7 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
   final TextEditingController nota1Controller = TextEditingController();
   final TextEditingController nota2Controller = TextEditingController();
   final TextEditingController nota3Controller = TextEditingController();
+  final TextEditingController nota4Controller = TextEditingController();
 
   String nomeAluno = '';
   String situacao = ''; //aprovado, recuperação, aprovado
@@ -50,8 +51,13 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
     double? nota3 = double.tryParse(
       nota3Controller.text.replaceAll(',', '.')
       );
+    double? nota4 = double.tryParse(
+      nota4Controller.text.replaceAll(',', '.')
+      );
 
-    if (nome.isEmpty || nota1 == null || nota2 == null || nota3 == null) {
+    
+
+    if (nome.isEmpty || nota1 == null || nota2 == null || nota3 == null || nota4 == null) {
       mostrarMensagem("Preencha todos os campos corretamente");
       return;
     }
@@ -61,13 +67,15 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
         nota2 < 0 ||
         nota2 > 10 ||
         nota3 < 0 ||
-        nota3 > 10
+        nota3 > 10 ||
+        nota4 < 0 ||
+        nota4 > 10
         ) {
       mostrarMensagem("As notas devemestar entre 0 e 10");
       return;
     }
 
-    double mediaCalculada = (nota1 + nota2 + nota3) / 3;
+    double mediaCalculada = (nota1 + nota2 + nota3 + nota4) / 4;
 
     String situacaoCalculada;
 
@@ -100,6 +108,7 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
     nota1Controller.clear();
     nota2Controller.clear();
     nota3Controller.clear();
+    nota4Controller.clear();
 
     setState(() {
       nomeAluno = '';
@@ -135,20 +144,18 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Icon(
-              // BLOCO DE CÓDIGO PARA INSERIR ÍCONE
+              
               Icons.school,
               size: 80,
             ),
-            const SizedBox(height: 10), // FINAL DO BLOCO QUE INSERE O ÍCONE
-
-            const Text(
-              // BLOCO QUE INSERE TEXTO: "MÉDIA ESCOLAR"
+            const SizedBox(height: 10), 
+            const Text(            
               'Média Escolar',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-              ), // FINAL DO BLOCO TEXTO
+              ), 
             ),
             const SizedBox(height: 5),
 
@@ -218,6 +225,21 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
               ),
             ),
 
+            const SizedBox(height: 15),
+
+            TextField(
+              controller: nota4Controller,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Nota 4',
+                hintText: 'Digite uma nota de 0 a 10',
+                prefixIcon: Icon(Icons.edit),
+                border: OutlineInputBorder(),
+              ),
+            ),
+
             const SizedBox(height: 20),
 
             ElevatedButton.icon(
@@ -245,7 +267,7 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
 
                       Icon(
                         escolherIcone(),
-                        size: 60,
+                        size: 50,
                       ),
                       const SizedBox(height:10),
 
