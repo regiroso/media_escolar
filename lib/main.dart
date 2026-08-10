@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 // A função main() é a porta de entrada do aplicativo
@@ -34,10 +35,15 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
   final TextEditingController nota2Controller = TextEditingController();
   final TextEditingController nota3Controller = TextEditingController();
   final TextEditingController nota4Controller = TextEditingController();
+  final TextEditingController frequenciaController = TextEditingController();
 
   String nomeAluno = '';
   String situacao = ''; //aprovado, recuperação, aprovado
   double media = 0;
+  double maiorNota = 0;
+  double menorNota = 0;
+  double frequencia = 0;
+  
 
   void calcularMedia() {
     String nome = nomeController.text.trim();
@@ -54,10 +60,14 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
     double? nota4 = double.tryParse(
       nota4Controller.text.replaceAll(',', '.')
       );
+    double? campoFrequencia = double.tryParse(
+      frequenciaController.text.replaceAll(',' , '.')
+      );
 
     
+    
 
-    if (nome.isEmpty || nota1 == null || nota2 == null || nota3 == null || nota4 == null) {
+    if (nome.isEmpty || nota1 == null || nota2 == null || nota3 == null || nota4 == null ||campoFrequencia == null) {
       mostrarMensagem("Preencha todos os campos corretamente");
       return;
     }
@@ -69,28 +79,51 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
         nota3 < 0 ||
         nota3 > 10 ||
         nota4 < 0 ||
-        nota4 > 10
-        ) {
-      mostrarMensagem("As notas devemestar entre 0 e 10");
+        nota4 > 10 ) {
+      mostrarMensagem("As notas devem estar entre 0 e 10");
       return;
     }
 
-    double mediaCalculada = (nota1 + nota2 + nota3 + nota4) / 4;
+    //double mediaCalculada = (nota1 + nota2 + nota3 + nota4) / 4;
+    final List<double> notas = [
+    nota1,
+    nota2,
+    nota3,
+    nota4,
+    ];
+
+    final double mediaCalculada =
+    (nota1 + nota2 + nota3 + nota4) / 4;
+
+    final double maiorNotaCalculada = notas.reduce(max);
+    final double menorNotaCalculada = notas.reduce(min);
 
     String situacaoCalculada;
+    if (campoFrequencia < 0 || campoFrequencia > 100) {
+    mostrarMensagem("A frequência deve estar entre 0 e 100%");
+    return;
+  }
 
-    if (mediaCalculada >= 7) {
+        
+    if (mediaCalculada >= 7 && campoFrequencia >= 75) {
       situacaoCalculada = 'APROVADO';
-    } else if (mediaCalculada >= 5) {
+    } else if (mediaCalculada >= 7 && campoFrequencia <= 75) {
+      situacaoCalculada = 'REPROVADO POR FALTA';
+    } else if (mediaCalculada >= 5 && campoFrequencia >= 75) {
       situacaoCalculada = 'RECUPERAÇÃO';
     } else {
       situacaoCalculada = 'REPROVADO';
     }
 
+    
+
     setState(() {
       nomeAluno = nome;
       media = mediaCalculada;
       situacao = situacaoCalculada;
+      maiorNota = maiorNotaCalculada;
+      menorNota = menorNotaCalculada;
+      frequencia = campoFrequencia;
     });
 
   }
@@ -109,11 +142,13 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
     nota2Controller.clear();
     nota3Controller.clear();
     nota4Controller.clear();
+    frequenciaController.clear();
 
     setState(() {
       nomeAluno = '';
       media = 0;
       situacao = '';
+      frequencia = 0;
     });
   }
 
@@ -168,7 +203,7 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
               textAlign: TextAlign.center,
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 50),
 
             TextField(
               controller: nomeController,
@@ -240,6 +275,21 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
               ),
             ),
 
+            const SizedBox(height: 15),
+
+            TextField(
+              controller: frequenciaController,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'FREQUÊNCIA',
+                hintText: 'Informe o valor da frequência',
+                prefixIcon: Icon(Icons.edit),
+                border: OutlineInputBorder(),
+              ),
+            ),
+
             const SizedBox(height: 20),
 
             ElevatedButton.icon(
@@ -264,13 +314,13 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-
+                      //************************************************* quadro com resultado  
                       Icon(
                         escolherIcone(),
                         size: 50,
                       ),
                       const SizedBox(height:10),
-
+                      
                       Text(
                         nomeAluno,
                         style: const TextStyle(
@@ -286,7 +336,30 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
                           fontSize: 20
                         ),
                       ),
+                       const SizedBox(height: 10,),
 
+                      Text(
+                        'Frequência: ${frequencia.toStringAsFixed(1)} %',
+                        style: const TextStyle(
+                          fontSize: 20
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                        Text(
+                          'Maior nota: ${maiorNota.toStringAsFixed(1)}',
+                        style: const TextStyle(
+                          fontSize: 20,                          
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                        Text(
+                          'Menor nota: ${menorNota.toStringAsFixed(1)}',
+                          style: const TextStyle(
+                            fontSize: 20,                            
+                          ),
+                        ),
                       const SizedBox(height: 10,),
 
                       Text(
@@ -298,18 +371,10 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
                       )
 
 
-
-
                     ],
                   ),),
                 ),
-              
-
-
-
-            /* ##################
-            DIGITE O NOME E AS TREÊS NOTAS DO ALUNO
-            #####################*/
+                      
           ],
         ),
       ),
