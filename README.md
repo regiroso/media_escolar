@@ -71,4 +71,4 @@ Resultado:
 - [X] Mostrar a maior nota
 - [X] Mostrar a menor nota
 - [ ] Informar quantos pontos faltaram para aprovação
-- [ ] Reprovar o aluno que tiver uma frequência menor que 75%
+- [X] Reprovar o aluno que tiver uma frequência menor que 75%

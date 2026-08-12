@@ -43,35 +43,30 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
   double maiorNota = 0;
   double menorNota = 0;
   double frequencia = 0;
-  
+  double notaFaltante = 0;
+  String mensagemFaltante = '';
 
   void calcularMedia() {
     String nome = nomeController.text.trim();
 
-    double? nota1 = double.tryParse(
-      nota1Controller.text.replaceAll(',', '.')
-      );
-    double? nota2 = double.tryParse(
-      nota2Controller.text.replaceAll(',', '.')
-      );
-    double? nota3 = double.tryParse(
-      nota3Controller.text.replaceAll(',', '.')
-      );
-    double? nota4 = double.tryParse(
-      nota4Controller.text.replaceAll(',', '.')
-      );
+    double? nota1 = double.tryParse(nota1Controller.text.replaceAll(',', '.'));
+    double? nota2 = double.tryParse(nota2Controller.text.replaceAll(',', '.'));
+    double? nota3 = double.tryParse(nota3Controller.text.replaceAll(',', '.'));
+    double? nota4 = double.tryParse(nota4Controller.text.replaceAll(',', '.'));
     double? campoFrequencia = double.tryParse(
-      frequenciaController.text.replaceAll(',' , '.')
-      );
+      frequenciaController.text.replaceAll(',', '.'),
+    );
 
-    
-    
-
-    if (nome.isEmpty || nota1 == null || nota2 == null || nota3 == null || nota4 == null ||campoFrequencia == null) {
+    if (nome.isEmpty ||
+        nota1 == null ||
+        nota2 == null ||
+        nota3 == null ||
+        nota4 == null ||
+        campoFrequencia == null) {
       mostrarMensagem("Preencha todos os campos corretamente");
       return;
     }
-    
+
     if (nota1 < 0 ||
         nota1 > 10 ||
         nota2 < 0 ||
@@ -79,64 +74,66 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
         nota3 < 0 ||
         nota3 > 10 ||
         nota4 < 0 ||
-        nota4 > 10 ) {
+        nota4 > 10) {
       mostrarMensagem("As notas devem estar entre 0 e 10");
       return;
     }
 
     //double mediaCalculada = (nota1 + nota2 + nota3 + nota4) / 4;
-    final List<double> notas = [
-    nota1,
-    nota2,
-    nota3,
-    nota4,
-    ];
+    final List<double> notas = [nota1, nota2, nota3, nota4];
 
-    final double mediaCalculada =
-    (nota1 + nota2 + nota3 + nota4) / 4;
+    final double mediaCalculada = (nota1 + nota2 + nota3 + nota4) / 4;
 
     final double maiorNotaCalculada = notas.reduce(max);
     final double menorNotaCalculada = notas.reduce(min);
+    
 
     String situacaoCalculada;
-    if (campoFrequencia < 0 || campoFrequencia > 100) {
-    mostrarMensagem("A frequência deve estar entre 0 e 100%");
-    return;
-  }
+    double notaFaltanteCalculada = 0;
+    String mensagemNotaFaltanteCalculada = '';
 
-        
-    if (mediaCalculada >= 7 && campoFrequencia >= 75) {
-      situacaoCalculada = 'APROVADO';
-    } else if (mediaCalculada >= 7 && campoFrequencia <= 75) {
-      situacaoCalculada = 'REPROVADO POR FALTA';
-    } else if (mediaCalculada >= 5 && campoFrequencia >= 75) {
-      situacaoCalculada = 'RECUPERAÇÃO';
-    } else {
-      situacaoCalculada = 'REPROVADO';
+    if (campoFrequencia < 0 || campoFrequencia > 100) {
+      mostrarMensagem("A frequência deve estar entre 0 e 100%");
+      return;
     }
 
+    if (mediaCalculada >= 7 && campoFrequencia >= 75) {
+      situacaoCalculada = 'APROVADO';
+      mensagemNotaFaltanteCalculada = '';
+    } else if (mediaCalculada >= 7 && campoFrequencia < 75) {
+      situacaoCalculada = 'REPROVADO POR FALTA';      
+    } else if (mediaCalculada >= 5 && campoFrequencia >= 75) {
+      situacaoCalculada = 'RECUPERAÇÃO';
+      mensagemNotaFaltanteCalculada = 'Faltou ${(7 - mediaCalculada).toStringAsFixed(1)} de nota para atingir a média 7.';
+    } else {
+      situacaoCalculada = 'REPROVADO';
+      mensagemNotaFaltanteCalculada = 'Faltou ${(7 - mediaCalculada).toStringAsFixed(1)} de nota para atingir a média 7.';
+    }
+
+    // notaFaltanteCalculada = 7 - mediaCalculada;
+    
+    
     
 
     setState(() {
-      nomeAluno = nome;
-      media = mediaCalculada;
-      situacao = situacaoCalculada;
-      maiorNota = maiorNotaCalculada;
-      menorNota = menorNotaCalculada;
-      frequencia = campoFrequencia;
+  nomeAluno = nome;
+  media = mediaCalculada;
+  situacao = situacaoCalculada;
+  maiorNota = maiorNotaCalculada;
+  menorNota = menorNotaCalculada;
+  frequencia = campoFrequencia;
+  notaFaltante = 7 - mediaCalculada;
+  mensagemFaltante = mensagemNotaFaltanteCalculada;
     });
-
   }
 
   void mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(context). showSnackBar(
-      SnackBar(
-        content: Text(mensagem)),
-      );    
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   } // *******************************************************************
-  
-  
-  void limparCampos(){
+
+  void limparCampos() {
     nomeController.clear();
     nota1Controller.clear();
     nota2Controller.clear();
@@ -149,14 +146,15 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
       media = 0;
       situacao = '';
       frequencia = 0;
+      mensagemFaltante = '';
     });
   }
 
-  IconData escolherIcone(){
-    if(situacao == "APROVADO"){
+  IconData escolherIcone() {
+    if (situacao == "APROVADO") {
       return Icons.check_circle;
     }
-    if(situacao == "RECUPERAÇÃO"){
+    if (situacao == "RECUPERAÇÃO") {
       return Icons.warning;
     }
 
@@ -178,19 +176,12 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(
-              
-              Icons.school,
-              size: 80,
-            ),
-            const SizedBox(height: 10), 
-            const Text(            
+            const Icon(Icons.school, size: 80),
+            const SizedBox(height: 10),
+            const Text(
               'Média Escolar',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ), 
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
 
@@ -298,12 +289,12 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
               label: const Text('Calcular Média'),
             ),
 
-            const SizedBox(height: 10,),
+            const SizedBox(height: 10),
 
             OutlinedButton.icon(
-              onPressed: limparCampos, 
+              onPressed: limparCampos,
               icon: const Icon(Icons.delete),
-              label: const Text("Limpar")
+              label: const Text("Limpar"),
             ),
 
             const SizedBox(height: 25),
@@ -313,68 +304,75 @@ class _MediaEscolarPageState extends State<MediaEscolarPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
-                    children: [
-                      //************************************************* quadro com resultado  
-                      Icon(
-                        escolherIcone(),
-                        size: 50,
-                      ),
-                      const SizedBox(height:10),
-                      
+                    children:[
+                      //************************************************* quadro com resultado
+                      Icon(escolherIcone(), size: 50),
+                      const SizedBox(height: 10),
+
                       Text(
                         nomeAluno,
                         style: const TextStyle(
                           fontSize: 22,
-                          fontWeight: FontWeight.bold
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 10,),
+                      const SizedBox(height: 10),
 
                       Text(
                         'Média: ${media.toStringAsFixed(1)}',
-                        style: const TextStyle(
-                          fontSize: 20
-                        ),
+                        style: const TextStyle(fontSize: 20),
                       ),
-                       const SizedBox(height: 10,),
+                      const SizedBox(height: 10),
 
                       Text(
                         'Frequência: ${frequencia.toStringAsFixed(1)} %',
-                        style: const TextStyle(
-                          fontSize: 20
-                        ),
+                        style: const TextStyle(fontSize: 20),
                       ),
                       const SizedBox(height: 10),
 
-                        Text(
-                          'Maior nota: ${maiorNota.toStringAsFixed(1)}',
-                        style: const TextStyle(
-                          fontSize: 20,                          
-                        ),
+                      Text(
+                        'Maior nota: ${maiorNota.toStringAsFixed(1)}',
+                        style: const TextStyle(fontSize: 20),
                       ),
                       const SizedBox(height: 10),
 
-                        Text(
-                          'Menor nota: ${menorNota.toStringAsFixed(1)}',
-                          style: const TextStyle(
-                            fontSize: 20,                            
-                          ),
-                        ),
-                      const SizedBox(height: 10,),
+                      Text(
+                        'Menor nota: ${menorNota.toStringAsFixed(1)}',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      const SizedBox(height: 10),
 
                       Text(
                         situacao,
                         style: const TextStyle(
                           fontSize: 24,
-                          fontWeight: FontWeight.bold
+                          fontWeight: FontWeight.bold,
                         ),
-                      )
+                      ),
 
-
+                      const SizedBox(height: 10),
+                            // Mensagem de quanto faltou (apenas quando houver)
+                        if (mensagemFaltante.isNotEmpty)
+                          Container (
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              // color: Colors.red.shade50,
+                              // borderRadius: BorderRadius.circular(8),
+                              // border: Border.all(color: Colors.red.shade200),
+                            ),
+                            child: Text(
+                            mensagemFaltante,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,                              color: Colors.red,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                     ],
-                  ),),
+                  ),
                 ),
-                      
+              ),
           ],
         ),
       ),
